@@ -1,44 +1,31 @@
-const rotDegree = 45;
-const rotRad = 2*Math.PI*(rotDegree/360);
-const betaRad = 2*Math.PI*((90 - (rotDegree/2))/360);
+const rotDegree = 30;
 const maxSize = 100;
+const rate = 1.4;
 
-const getRotation = (lvl, depth) => {
-    return 90*lvl/depth;
-}
-
-const getPosTop = (lvl) => {
-    if(lvl <= 0) return maxSize;
-    const k = maxSize/(Math.pow(2,lvl-1));
-    //return k*(Math.sin(rotRad) + Math.cos(rotRad));
-
-    return Math.sqrt(2)*k;
-}
-
-const getDiff = (lvl) => {
-    if(lvl === 0) return maxSize*2.5;
-    const k = getKForLvl(lvl);
-    return ctg(betaRad)*(k/2)/Math.sin(rotRad);
-}
-
-const getPosLeft = (lvl) => {
-    if(lvl === 0) return 3*maxSize;
-    const k = getKForLvl(lvl);
-    //return -k*(Math.cos(rotRad));
-    return -k*Math.sqrt(2)/2;
-}
+const toRad = (deg) => {
+    return Math.PI*2*(deg/360);
+};
 
 const ctg = (x) => {
     return 1/Math.tan(x);
 };
 
-const getHeight = (lvl) => {
-    
+const getDiff = (lvl) => {
+    if(lvl === 0) return 2*maxSize;
+    const k = getDiagForLvl(lvl);
+    const y = toRad(45 - rotDegree);
+    const l = getLength(lvl);
+    return ((k*Math.cos(y)) - l)/2;
 };
 
-const getDiagForLvl = (lvl) => {
+const getLength = (lvl) => {
     if(lvl === 0) return maxSize;
-    return Math.sqrt(2)*maxSize/(Math.pow(2,lvl));
+    return maxSize/(Math.pow(rate,lvl));
+}
+
+const getDiagForLvl = (lvl) => {
+    if(lvl === 0) return Math.sqrt(2)*maxSize;
+    return Math.sqrt(2)*maxSize/(Math.pow(rate,lvl));
 };
 
 const getStyle = (lvl, depth) => {
@@ -46,10 +33,10 @@ const getStyle = (lvl, depth) => {
         backgroundColor: "green",
         transform: `rotate(${lvl !== 0 ? rotDegree : 0}deg)`,
         position: 'absolute',
-        top: `${getKForLvl(lvl-1) + getDiff(lvl)}px`,
-        left: `${getKForLvl(lvl-1)/2 + 2*getDiff(lvl)}px`,
-        width: `${maxSize/(Math.pow(2,lvl))}px`,
-        height: `${maxSize/(Math.pow(2,lvl))}px`
+        top: `${lvl !== 0 ? getDiff(lvl) + getLength(lvl-1) : maxSize*3}px`,
+        left: `${lvl !== 0 ? -1.7*getDiff(lvl) : maxSize*4}px`,
+        width: `${getLength(lvl)}px`,
+        height: `${getLength(lvl)}px`
     };
 
     return res;
